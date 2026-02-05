@@ -42,9 +42,10 @@ public class JwtUtil {
 
     }
 
-    public String generateAccessToken(Long userId) {
+    public String generateAccessToken(Long userId, String nickname) {
         return Jwts.builder()
                 .subject(userId.toString())
+                .claim("nickname", nickname)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(getKey())

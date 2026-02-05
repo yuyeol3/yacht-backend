@@ -1,11 +1,18 @@
 package io.github.yuyeol3.yachtbackend;
 
+import io.github.yuyeol3.yachtbackend.user.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -13,13 +20,29 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends GenericFilterBean {
     private final JwtUtil jwtUtil;
+    private final MyUserDetailsService userDetailsService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
     throws IOException, ServletException {
 
-        String token = resolveToken
+        String token = resolveToken((HttpServletRequest) request);
 
+        if (token != null && jwtUtil.validateToken(token)) {
+            Long userId = jwtUtil.getUserIdFromToken(token);
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userId.toString());
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+            );
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+
+         chain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
