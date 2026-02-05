@@ -18,10 +18,10 @@ public enum ErrorCode {
     NICKNAME_OCCUPIED(HttpStatus.BAD_REQUEST, "U002", "사용 중인 닉네임입니다."),
     ID_EQUALS_NICKNAME(HttpStatus.BAD_REQUEST, "U003", "아이디와 닉네임은 달라야 합니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U004", "존재하지 않는 사용자입니다."),
-
+    USER_CREATE_CONFLICT(HttpStatus.CONFLICT, "U005", "계정 생성 중 충돌이 발생했습니다."),
 
     // Auth
-    INVALID_ID_OR_PWD(HttpStatus.NOT_FOUND, "A001", "아이디나 비밀번호에 맞는 사용자를 찾을 수 없습니다."),
+    INVALID_ID_OR_PWD(HttpStatus.UNAUTHORIZED, "A001", "아이디나 비밀번호에 맞는 사용자를 찾을 수 없습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A002", "인증되지 않았습니다.")
     ;
 

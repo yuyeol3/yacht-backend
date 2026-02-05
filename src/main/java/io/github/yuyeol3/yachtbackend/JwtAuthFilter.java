@@ -8,16 +8,19 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends GenericFilterBean {
     private final JwtUtil jwtUtil;
     private final MyUserDetailsService userDetailsService;
@@ -29,17 +32,27 @@ public class JwtAuthFilter extends GenericFilterBean {
         String token = resolveToken((HttpServletRequest) request);
 
         if (token != null && jwtUtil.validateToken(token)) {
-            Long userId = jwtUtil.getUserIdFromToken(token);
+            try {
+                Long userId = jwtUtil.getUserIdFromToken(token);
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userId.toString());
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userId.toString());
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
-            );
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+            catch (UsernameNotFoundException e) {
+                SecurityContextHolder.clearContext();
+            }
+            catch (Exception e) {
+                log.error("인증 처리 중 알 수 없는 에러", e.getMessage());
+                SecurityContextHolder.clearContext();
+            }
+
         }
 
          chain.doFilter(request, response);

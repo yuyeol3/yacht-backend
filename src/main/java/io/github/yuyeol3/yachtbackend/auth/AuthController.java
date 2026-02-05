@@ -5,7 +5,6 @@ import io.github.yuyeol3.yachtbackend.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,16 +33,36 @@ public class AuthController {
                 .body(new GenericDataResponse<>(res.accessToken()));
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Void> logout(@CookieValue("refresh_token") String refreshToken) {
         authService.logout(refreshToken);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        // 클라이언트 쿠키 삭제용
+        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+                .maxAge(0)
+                .path("/auth")
+                .build();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
-    @GetMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<GenericDataResponse<String>> refresh(@CookieValue("refresh_token") String refreshToken) {
-        GenericDataResponse<String> res = authService.refresh(refreshToken);
-        return new ResponseEntity<>(res, HttpStatus.OK);
+        LoginResponse res = authService.refresh(refreshToken);
+        ResponseCookie cookie = ResponseCookie
+                .from("refresh_token", res.refreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Strict")
+                .path("/auth")
+                .maxAge(jwtUtil.getRefreshExpiration())
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new GenericDataResponse<>(res.accessToken()));
     }
 
 }

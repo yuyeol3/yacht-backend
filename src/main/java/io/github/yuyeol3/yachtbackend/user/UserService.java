@@ -3,6 +3,7 @@ package io.github.yuyeol3.yachtbackend.user;
 import io.github.yuyeol3.yachtbackend.error.BusinessException;
 import io.github.yuyeol3.yachtbackend.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +32,20 @@ public class UserService {
             throw new BusinessException(ErrorCode.ID_EQUALS_NICKNAME);
         }
 
-        String passwordHash = passwordEncoder.encode(userCreateRequest.password());
-        User user = User.builder()
-                .loginId(userCreateRequest.loginId())
-                .password(passwordHash)
-                .nickname(userCreateRequest.nickname())
-                .role(Role.USER)
-                .build();
-        return userRepository.save(user).getId();
+        try {
+            String passwordHash = passwordEncoder.encode(userCreateRequest.password());
+            User user = User.builder()
+                    .loginId(userCreateRequest.loginId())
+                    .password(passwordHash)
+                    .nickname(userCreateRequest.nickname())
+                    .role(Role.USER)
+                    .build();
+            return userRepository.save(user).getId();
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new BusinessException(ErrorCode.USER_CREATE_CONFLICT);
+        }
+
     }
 
     // TODO : 게임 이력 등 정보 추가

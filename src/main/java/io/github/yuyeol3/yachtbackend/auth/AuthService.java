@@ -1,6 +1,5 @@
 package io.github.yuyeol3.yachtbackend.auth;
 
-import io.github.yuyeol3.yachtbackend.GenericDataResponse;
 import io.github.yuyeol3.yachtbackend.JwtUtil;
 import io.github.yuyeol3.yachtbackend.error.BusinessException;
 import io.github.yuyeol3.yachtbackend.error.ErrorCode;
@@ -51,25 +50,53 @@ public class AuthService {
 
     @Transactional
     public void logout(String refreshToken) {
-        byte[] rawToken = Base64.getDecoder().decode(refreshToken);
-        byte[] hashedToken = jwtUtil.hashToken(rawToken);
-        refreshTokenRepository.deleteById(hashedToken);
+        try {
+            byte[] rawToken = Base64.getDecoder().decode(refreshToken);
+            byte[] hashedToken = jwtUtil.hashToken(rawToken);
+            refreshTokenRepository.deleteById(hashedToken);
+        }
+        catch (IllegalArgumentException e) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
     }
 
-    public GenericDataResponse<String> refresh(String token) {
-        byte[] rawToken = Base64.getDecoder().decode(token);
-        byte[] hashedToken = jwtUtil.hashToken(rawToken);
+    @Transactional
+    public LoginResponse refresh(String token) {
+        try {
+            byte[] rawToken = Base64.getDecoder().decode(token);
+            byte[] hashedToken = jwtUtil.hashToken(rawToken);
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(hashedToken)
-                .orElseThrow(()->new BusinessException(ErrorCode.UNAUTHORIZED));
+            RefreshToken refreshToken = refreshTokenRepository.findById(hashedToken)
+                    .orElseThrow(()->new BusinessException(ErrorCode.UNAUTHORIZED));
 
-        if (!refreshToken.isValid()) {
+            if (!refreshToken.isValid()) {
+                throw new BusinessException(ErrorCode.UNAUTHORIZED);
+            }
+
+            User user = refreshToken.getUser();
+
+            String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getNickname());
+
+            // Rotate refresh token: delete old, issue new
+            refreshTokenRepository.delete(refreshToken);
+
+            byte[] newRawRefreshToken = jwtUtil.generateRefreshToken();
+            byte[] newHashedRefreshToken = jwtUtil.hashToken(newRawRefreshToken);
+            RefreshToken newRefreshToken = RefreshToken.builder()
+                    .id(newHashedRefreshToken)
+                    .validUntil(LocalDateTime.now().plusSeconds(jwtUtil.getRefreshExpiration()))
+                    .user(user)
+                    .build();
+            refreshTokenRepository.save(newRefreshToken);
+
+            return LoginResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(Base64.getEncoder().encodeToString(newRawRefreshToken))
+                    .build();
+        }
+        catch (IllegalArgumentException e) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
-        User user = refreshToken.getUser();
-        String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getNickname());
-
-        return new GenericDataResponse<>(accessToken);
     }
 }

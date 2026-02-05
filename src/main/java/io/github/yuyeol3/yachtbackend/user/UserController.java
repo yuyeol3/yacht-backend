@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/{nickname}")
-    public ResponseEntity<UserResponse> get(@PathVariable @NotBlank String nickname) {
+    public ResponseEntity<UserResponse> get(@PathVariable @Valid @NotBlank String nickname) {
         UserResponse u = userService.findByNickname(nickname);
         return new ResponseEntity<>(u, HttpStatus.OK);
     }
