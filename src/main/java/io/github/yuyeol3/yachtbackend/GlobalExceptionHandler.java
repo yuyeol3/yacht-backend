@@ -6,6 +6,8 @@ import io.github.yuyeol3.yachtbackend.error.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -27,6 +29,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     protected ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException e) {
         return ErrorResponse.toResponseEntity(ErrorCode.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MissingRequestCookieException.class)
+    protected ResponseEntity<ErrorResponse> handleMissingRequestCookieException(MissingRequestCookieException e) {
+        return ErrorResponse.toResponseEntity(ErrorCode.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     @ExceptionHandler(Exception.class)

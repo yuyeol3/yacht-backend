@@ -1,0 +1,55 @@
+package io.github.yuyeol3.yachtbackend.game;
+
+
+import io.github.yuyeol3.yachtbackend.TimeEntity;
+import io.github.yuyeol3.yachtbackend.user.User;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "game_rooms")
+public class GameRoom extends TimeEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="status", nullable = false)
+    private GameStatus status;
+
+    @Version
+    private Long version;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "host_id")
+    private User host;
+
+    @OneToMany(mappedBy = "gameRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Participated> participants = new ArrayList<>();
+
+    public GameRoom(User host) {
+        this.host = host;
+        this.status = GameStatus.WAITING;
+    }
+
+
+    public void start() {
+        this.status = GameStatus.PLAYING;
+    }
+
+    public void end() {
+        this.status = GameStatus.WAITING;
+    }
+
+
+
+
+}
