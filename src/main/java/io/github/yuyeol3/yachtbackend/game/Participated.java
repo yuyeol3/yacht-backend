@@ -8,7 +8,7 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "participated")
-public class Participated extends TimeEntity {
+public class Participated {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
