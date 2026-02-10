@@ -1,4 +1,4 @@
-package io.github.yuyeol3.yachtbackend.game;
+package io.github.yuyeol3.yachtbackend.gameroom;
 
 
 import io.github.yuyeol3.yachtbackend.TimeEntity;
@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

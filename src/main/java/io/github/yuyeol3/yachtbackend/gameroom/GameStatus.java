@@ -1,4 +1,4 @@
-package io.github.yuyeol3.yachtbackend.game;
+package io.github.yuyeol3.yachtbackend.gameroom;
 
 
 public enum GameStatus {

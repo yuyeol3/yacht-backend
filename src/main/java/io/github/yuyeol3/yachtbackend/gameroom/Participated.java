@@ -1,6 +1,5 @@
-package io.github.yuyeol3.yachtbackend.game;
+package io.github.yuyeol3.yachtbackend.gameroom;
 
-import io.github.yuyeol3.yachtbackend.TimeEntity;
 import io.github.yuyeol3.yachtbackend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
