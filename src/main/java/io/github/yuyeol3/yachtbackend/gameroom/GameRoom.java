@@ -24,6 +24,9 @@ public class GameRoom extends TimeEntity {
     @Column(name="status", nullable = false)
     private GameStatus status;
 
+    @Column(name="room_name", nullable = false)
+    private String roomName;
+
     @Version
     private Long version;
 
@@ -34,8 +37,9 @@ public class GameRoom extends TimeEntity {
     @OneToMany(mappedBy = "gameRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participated> participants = new ArrayList<>();
 
-    public GameRoom(User host) {
+    public GameRoom(User host, String roomName) {
         this.host = host;
+        this.roomName = roomName;
         this.status = GameStatus.WAITING;
     }
 

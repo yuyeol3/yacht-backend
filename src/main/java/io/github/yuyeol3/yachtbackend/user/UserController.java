@@ -21,7 +21,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<GenericDataResponse<Long>> create(@RequestBody @Valid UserCreateRequest userCreateRequest) {
         Long id = userService.create(userCreateRequest);
-        return new ResponseEntity<>(new GenericDataResponse<Long>(id), HttpStatus.CREATED);
+        return new ResponseEntity<>(new GenericDataResponse<>(id), HttpStatus.CREATED);
     }
 
     @GetMapping("/{nickname}")
