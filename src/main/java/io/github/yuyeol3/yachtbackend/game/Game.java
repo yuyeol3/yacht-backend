@@ -3,6 +3,7 @@ package io.github.yuyeol3.yachtbackend.game;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,4 +28,10 @@ public class Game {
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Played> players = new ArrayList<>();
+
+    @Builder
+    public Game(LocalDateTime startedAt, LocalDateTime endedAt) {
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
+    }
 }

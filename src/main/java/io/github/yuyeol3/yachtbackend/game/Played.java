@@ -24,8 +24,11 @@ public class Played {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "score")
+    @Column(name = "score",  nullable = false)
     private int score;
+
+    @Column(name = "rank", nullable = false)
+    private int rank;
 
     @Enumerated(EnumType.STRING)
     @Column(name="game_result", nullable = false)
@@ -33,10 +36,11 @@ public class Played {
 
 
     @Builder
-    public Played(Game game, User user, int score, GameResult gameResult) {
+    public Played(Game game, User user, int score, int rank, GameResult gameResult) {
         this.game = game;
         this.user = user;
         this.score = score;
+        this.rank = rank;
         this.gameResult = gameResult;
     }
 }

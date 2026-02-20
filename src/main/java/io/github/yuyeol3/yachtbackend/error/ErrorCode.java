@@ -22,7 +22,13 @@ public enum ErrorCode {
 
     // Auth
     INVALID_ID_OR_PWD(HttpStatus.UNAUTHORIZED, "A001", "아이디나 비밀번호에 맞는 사용자를 찾을 수 없습니다."),
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A002", "인증되지 않았습니다.")
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A002", "인증되지 않았습니다."),
+
+    // Game
+    NOT_YOUR_TURN(HttpStatus.FORBIDDEN, "G001", "차례가 아닙니다."),
+    ROLL_CHANCE_OVER(HttpStatus.BAD_REQUEST, "G002", "주사위를 더 굴릴 수 없습니다."),
+    FILLED_SCORE(HttpStatus.BAD_REQUEST, "G003", "이미 채운 칸입니다."),
+    NOT_ROLLED(HttpStatus.BAD_REQUEST, "G004", "아직 주사위를 굴리지 않았습니다.")
     ;
 
 
