@@ -4,8 +4,7 @@ package io.github.yuyeol3.yachtbackend.gameroom;
 import io.github.yuyeol3.yachtbackend.GenericDataResponse;
 import io.github.yuyeol3.yachtbackend.error.BusinessException;
 import io.github.yuyeol3.yachtbackend.error.ErrorCode;
-import io.github.yuyeol3.yachtbackend.game.GameState;
-import io.github.yuyeol3.yachtbackend.game.GameStateRepository;
+import io.github.yuyeol3.yachtbackend.game.*;
 import io.github.yuyeol3.yachtbackend.game.dto.UserScoreBoard;
 import io.github.yuyeol3.yachtbackend.gameroom.dto.*;
 import io.github.yuyeol3.yachtbackend.user.User;
@@ -31,6 +30,9 @@ public class GameRoomService {
     private final GameStateRepository  gameStateRepository;
     private final ParticipatedRepository participatedRepository;
     private final UserRepository userRepository;
+    private final GameUtil gameUtil;
+
+    private final GameService gameService;
 
     @Transactional
     public GenericDataResponse<Long> createRoom(GameRoomCreateRequest gameRoomCreateRequest,
@@ -88,13 +90,27 @@ public class GameRoomService {
                 ()->new BusinessException(ErrorCode.NOT_FOUND)
         );
 
+        // 방장이 아닌 경우
         if (!gameRoom.getHost().getId().equals(user.getId())) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
         List<ParticipatedState> participants = participatedRepository.findMembersByRoomId(roomId);
-        List<Long> turnList = participants.stream().map(ParticipatedState::userId).toList();
+        boolean isAllReady = true;
+        for (ParticipatedState p : participants) {
+            isAllReady = isAllReady & p.isReady();
+        }
 
+        if (!isAllReady) {
+            throw new BusinessException(ErrorCode.NOT_READY);
+        }
+
+        // 게임이 이미 시작된 경우
+        if (gameRoom.getStatus().equals(GameStatus.PLAYING)) {
+            throw new BusinessException(ErrorCode.ALREADY_PLAYING);
+        }
+
+        List<Long> turnList = participants.stream().map(ParticipatedState::userId).toList();
         Map<Long, UserScoreBoard> newScores = new HashMap<>();
         for (Long userIds : turnList) {
             newScores.put(userIds, UserScoreBoard.empty());
@@ -102,7 +118,7 @@ public class GameRoomService {
 
         GameState gs = GameState.builder()
                 .startedAt(LocalDateTime.now())
-                .turnTimeoutTime(LocalDateTime.now())
+                .turnTimeoutTime(LocalDateTime.now().plusMinutes(gameUtil.getTurnLimitMinutes()))
                 .roomId(roomId)
                 .curTurnUserId(turnList.getFirst())
                 .leftRollCnt(3)
@@ -115,6 +131,8 @@ public class GameRoomService {
                 .build();
 
         gameStateRepository.save(roomId, gs);
+        gameService.startInitialTimer(roomId);
+        gameRoom.start();
         return gs;
     }
 
@@ -126,6 +144,10 @@ public class GameRoomService {
         GameRoom gameRoom = gameRoomRepository.findById(roomId).orElseThrow(
                 ()->new BusinessException(ErrorCode.NOT_FOUND)
         );
+
+        if (gameRoom.getStatus().equals(GameStatus.PLAYING)) {
+            throw new BusinessException(ErrorCode.ALREADY_PLAYING);
+        }
 
         participatedRepository.save(roomId, userId, user.getNickname());
         ParticipatedState participant = participatedRepository.findByMemberIdAndRoomId(userId, roomId)

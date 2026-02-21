@@ -1,12 +1,32 @@
 package io.github.yuyeol3.yachtbackend.game;
 
+import io.github.yuyeol3.yachtbackend.game.dto.UserScoreBoard;
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Getter
 public class GameUtil {
+
+    private final int turnLimitMinutes = 3;
+
+    public String getFirstEmptyCategory(UserScoreBoard board) {
+        if (board.ones() == null) return "ONES";
+        if (board.twos() == null) return "TWOS";
+        if (board.threes() == null) return "THREES";
+        if (board.fours() == null) return "FOURS";
+        if (board.fives() == null) return "FIVES";
+        if (board.sixes() == null) return "SIXES";
+        if (board.choice() == null) return "CHOICE";
+        if (board.fourOfAKind() == null) return "FOUR_OF_A_KIND";
+        if (board.fullHouse() == null) return "FULL_HOUSE";
+        if (board.sStraight() == null) return "S_STRAIGHT";
+        if (board.lStraight() == null) return "L_STRAIGHT";
+        return "YACHT";
+    }
 
     public int calculateScore(List<Integer> dice, String category) {
 

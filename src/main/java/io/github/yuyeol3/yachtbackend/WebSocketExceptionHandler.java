@@ -23,7 +23,7 @@ public class WebSocketExceptionHandler {
     }
 
     @MessageExceptionHandler(Exception.class)
-    @SendToUser("/queue/error")
+    @SendToUser("/queue/errors")
     public SocketResponse<ErrorResponse> handleException(Exception e) {
         ErrorCode code = ErrorCode.INTERNAL_SERVER_ERROR;
         return new SocketResponse<>(MessageType.ERROR, new ErrorResponse(code.getCode(), code.getMessage()));

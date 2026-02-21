@@ -3,14 +3,22 @@ package io.github.yuyeol3.yachtbackend.game;
 import io.github.yuyeol3.yachtbackend.error.BusinessException;
 import io.github.yuyeol3.yachtbackend.error.ErrorCode;
 import io.github.yuyeol3.yachtbackend.game.dto.GameAction;
+import io.github.yuyeol3.yachtbackend.game.dto.SocketResponse;
 import io.github.yuyeol3.yachtbackend.game.dto.UserScoreBoard;
 import io.github.yuyeol3.yachtbackend.gameroom.ParticipatedRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +29,16 @@ public class GameService {
     private final ParticipatedRepository participatedRepository;
     private final GameResultService gameResultService;
     private final GameUtil gameUtil;
+    private final GameTimerService gameTimerService;
 
+    public Function<GameTimerService.FuncArgs, GameState> getTimerTask() {
+        return t
+                    -> applyScoreAndNextTurn(t.state(), t.userId(), t.category(), t.score());
+    }
+
+    public void startInitialTimer(Long roomId) {
+        gameTimerService.startTurnTimer(getTimerTask(), roomId, 1, 0);
+    }
 
     public GameState processAction(Long roomId, Long userId, GameAction action) {
         GameState state = gameStateRepository.update(roomId, currentState-> {
@@ -37,9 +54,19 @@ public class GameService {
             };
         });
 
-        if (state.round() >= 13) gameResultService.saveGameResults(state);
+        if (state.round() >= 13) {
+            gameTimerService.cancelTimer(roomId);
+            gameResultService.saveGameResults(state);
+        }
+        else if (action.type() == MessageType.SELECT_SCORE) {
+            gameTimerService.startTurnTimer(
+                   getTimerTask(), roomId, state.round(), state.turn()
+            );
+        }
         return state;
     }
+
+
 
     private GameState keepToggleDice(GameState state, GameAction action) {
         if (state.leftRollCnt() == 3)
@@ -84,12 +111,18 @@ public class GameService {
         String category = action.scoreCategory();
         int score = gameUtil.calculateScore(state.dice(), category);
 
-        Map<Long, UserScoreBoard> newScores = new HashMap<>(state.scores());
-        UserScoreBoard myBoard = newScores.get(userId);
-
+        UserScoreBoard myBoard = state.scores().get(userId);
         if (myBoard.hasScore(category)) {
             throw new BusinessException(ErrorCode.FILLED_SCORE);
         }
+
+        return applyScoreAndNextTurn(state, userId, category, score);
+    }
+
+    private GameState applyScoreAndNextTurn(GameState state, Long userId, String category, int score) {
+        Map<Long, UserScoreBoard> newScores = new HashMap<>(state.scores());
+        UserScoreBoard myBoard = newScores.get(userId);
+
         UserScoreBoard newBoard = UserScoreBoard.update(myBoard, category, score);
         // 보너스 판정 로직
         if (newBoard.upperScore() >= 63 && newBoard.bonus() == null) {
@@ -98,7 +131,6 @@ public class GameService {
                     .total(newBoard.total() + 35)
                     .build();
         }
-
         newScores.put(userId, newBoard);
         int nextTurn = (state.turn() + 1) % state.turnList().size();
         int nextRound = nextTurn == 0 ? state.round() + 1 : state.round();
@@ -114,23 +146,16 @@ public class GameService {
         }
 
 
-        // 게임 종료 여부 확인
-//        if (nextRound >= 13) {
-//            saveGameResults(state);
-//        }
-        //
-
         return state.toBuilder()
                 .scores(newScores)
                 .curTurnUserId(state.turnList().get(nextTurn))
                 .leftRollCnt(3)
                 .dice(List.of(0,0,0,0,0))
                 .kept(List.of(false, false, false, false, false))
-                .turnTimeoutTime(LocalDateTime.now())
+                .turnTimeoutTime(LocalDateTime.now().plusMinutes(gameUtil.getTurnLimitMinutes()))
                 .round(nextRound)
                 .turn(nextTurn)
                 .build();
     }
-
 
 }

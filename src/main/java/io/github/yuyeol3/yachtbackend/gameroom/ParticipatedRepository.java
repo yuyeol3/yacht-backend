@@ -91,6 +91,10 @@ public class ParticipatedRepository {
         return List.copyOf(participants.values());
     }
 
+    public Long findRoomIdByUserId(Long userId) {
+        return userCurrentRoom.get(userId);
+    }
+
     public int count(Long roomId) {
         Map<Long, ParticipatedState> participants = roomParticipants.get(roomId);
         return  participants == null ? 0 : participants.size();

@@ -11,5 +11,6 @@ public enum MessageType {
     SELECT_SCORE,
 
     GAME_OVER,
-    ERROR
+    ERROR,
+    TIME_OUT
 }
