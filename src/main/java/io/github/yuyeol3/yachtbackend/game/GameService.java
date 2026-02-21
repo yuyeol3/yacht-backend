@@ -40,6 +40,7 @@ public class GameService {
         gameTimerService.startTurnTimer(getTimerTask(), roomId, 1, 0);
     }
 
+    @Transactional
     public GameState processAction(Long roomId, Long userId, GameAction action) {
         GameState state = gameStateRepository.update(roomId, currentState-> {
             if (!currentState.curTurnUserId().equals(userId)) {
@@ -135,15 +136,15 @@ public class GameService {
         int nextTurn = (state.turn() + 1) % state.turnList().size();
         int nextRound = nextTurn == 0 ? state.round() + 1 : state.round();
 
-        // 다음 차례 확인
-        while (nextRound <= 12 &&
-                participatedRepository
-                        .findByMemberIdAndRoomId(state.roomId(), state.turnList().get(nextTurn))
-                        .isEmpty()
-        ) {
-            nextTurn = (nextTurn + 1) % state.turnList().size();
-            nextRound = nextTurn == 0 ? state.round() + 1 : state.round();
-        }
+//        // 다음 차례 확인
+//        while (nextRound <= 12 &&
+//                participatedRepository
+//                        .findByMemberIdAndRoomId(state.roomId(), state.turnList().get(nextTurn))
+//                        .isEmpty()
+//        ) {
+//            nextTurn = (nextTurn + 1) % state.turnList().size();
+//            if (nextTurn == 0) nextRound++;
+//        }
 
 
         return state.toBuilder()

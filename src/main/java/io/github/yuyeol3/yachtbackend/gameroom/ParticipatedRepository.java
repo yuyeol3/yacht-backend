@@ -65,7 +65,7 @@ public class ParticipatedRepository {
         if (participants == null) {
             return Optional.empty();
         }
-        return Optional.of(participants.get(userId));
+        return Optional.ofNullable(participants.get(userId));
     }
 
 

@@ -37,6 +37,8 @@ public class GameController {
         template.convertAndSend("/sub/rooms/" + roomId,
                 new SocketResponse<>(state.round() >= 13 ? MessageType.GAME_OVER : action.type(), state)
         );
+
+        log.info("Action replied : Room={}, User={}, Type={}", roomId, userId, action.type());
     }
 }
 
