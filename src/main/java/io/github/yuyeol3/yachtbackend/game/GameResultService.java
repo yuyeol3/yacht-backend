@@ -1,7 +1,9 @@
 package io.github.yuyeol3.yachtbackend.game;
 
+import io.github.yuyeol3.yachtbackend.gameroom.GameRoom;
+import io.github.yuyeol3.yachtbackend.gameroom.GameRoomRepository;
 import io.github.yuyeol3.yachtbackend.gameroom.ParticipatedRepository;
-import io.github.yuyeol3.yachtbackend.gameroom.ParticipatedState;
+import io.github.yuyeol3.yachtbackend.gameroom.dto.ParticipatedState;
 import io.github.yuyeol3.yachtbackend.user.User;
 import io.github.yuyeol3.yachtbackend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class GameResultService {
     private final ParticipatedRepository participatedRepository;
     private final GameRepository gameRepository;
+    private final GameRoomRepository gameRoomRepository;
     private final PlayedRepository playedRepository;
     private final UserRepository userRepository;
 
@@ -95,6 +98,7 @@ public class GameResultService {
 
             playedRepository.save(p);
         }
+        gameRoomRepository.findById(state.roomId()).ifPresent(GameRoom::end);
     }
 
 }

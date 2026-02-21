@@ -2,8 +2,9 @@ package io.github.yuyeol3.yachtbackend.gameroom;
 
 
 import io.github.yuyeol3.yachtbackend.GenericDataResponse;
-import io.github.yuyeol3.yachtbackend.user.User;
-import io.github.yuyeol3.yachtbackend.user.UserRepository;
+import io.github.yuyeol3.yachtbackend.gameroom.dto.GameRoomCreateRequest;
+import io.github.yuyeol3.yachtbackend.gameroom.dto.GameRoomResponse;
+import io.github.yuyeol3.yachtbackend.gameroom.dto.GameRoomResponseDetail;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,16 +14,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @Slf4j
 @Controller
@@ -55,7 +50,7 @@ public class GameRoomController {
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<GameRoomResponse> getRoom(@PathVariable Long roomId) {
+    public ResponseEntity<GameRoomResponseDetail> getRoom(@PathVariable Long roomId) {
         return new ResponseEntity<>(gameRoomService.getRoomById(roomId), HttpStatus.OK);
     }
 

@@ -1,4 +1,4 @@
-package io.github.yuyeol3.yachtbackend.gameroom;
+package io.github.yuyeol3.yachtbackend.gameroom.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Length;

@@ -11,22 +11,14 @@ import java.util.Optional;
 @Repository
 public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
 
-    @Query("""
-        SELECT NEW io.github.yuyeol3.yachtbackend.gameroom.GameRoomResponse(
-             gr.id,
-             gr.roomName,
-             h.nickname,
-             COUNT(p)
-        )
-        FROM GameRoom gr
-        JOIN gr.host h
-        LEFT JOIN Participated p ON p.gameRoom = gr
-        GROUP BY gr.id, gr.roomName, h.nickname
-    """)
-    Slice<GameRoomResponse> findGameRooms(Pageable pageable);
+//    @Query("""
+//        SELECT *
+//        FROM GameRoom gr
+//    """)
+    Slice<GameRoom> findGameRooms(Pageable pageable);
 
 //    @Query("""
-//        SELECT NEW io.github.yuyeol3.yachtbackend.gameroom.GameRoomResponse(
+//        SELECT NEW io.github.yuyeol3.yachtbackend.gameroom.dto.GameRoomResponse(
 //             gr.id,
 //             gr.roomName,
 //             h.nickname,

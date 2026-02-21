@@ -38,12 +38,5 @@ public class GameController {
                 new SocketResponse<>(state.round() >= 13 ? MessageType.GAME_OVER : action.type(), state)
         );
     }
-
-    @MessageExceptionHandler(BusinessException.class)
-    @SendToUser("/queue/errors")
-    public SocketResponse<String> handleBusinessException(BusinessException e, Principal principal) {
-        return new SocketResponse<>(MessageType.ERROR, e.getMessage());
-    }
-
 }
 

@@ -1,9 +1,6 @@
-package io.github.yuyeol3.yachtbackend.gameroom;
+package io.github.yuyeol3.yachtbackend.gameroom.dto;
 
 import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 @Builder(toBuilder = true)
 public record ParticipatedState(

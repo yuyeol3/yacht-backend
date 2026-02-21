@@ -5,16 +5,12 @@ import io.github.yuyeol3.yachtbackend.error.ErrorCode;
 import io.github.yuyeol3.yachtbackend.game.dto.GameAction;
 import io.github.yuyeol3.yachtbackend.game.dto.UserScoreBoard;
 import io.github.yuyeol3.yachtbackend.gameroom.ParticipatedRepository;
-import io.github.yuyeol3.yachtbackend.gameroom.ParticipatedState;
-import io.github.yuyeol3.yachtbackend.user.User;
-import io.github.yuyeol3.yachtbackend.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor

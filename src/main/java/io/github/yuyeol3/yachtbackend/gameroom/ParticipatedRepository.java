@@ -2,7 +2,7 @@ package io.github.yuyeol3.yachtbackend.gameroom;
 
 import io.github.yuyeol3.yachtbackend.error.BusinessException;
 import io.github.yuyeol3.yachtbackend.error.ErrorCode;
-import jakarta.servlet.http.Part;
+import io.github.yuyeol3.yachtbackend.gameroom.dto.ParticipatedState;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -1,8 +1,11 @@
 package io.github.yuyeol3.yachtbackend.gameroom;
 
 import io.github.yuyeol3.yachtbackend.GenericDataResponse;
+import io.github.yuyeol3.yachtbackend.game.GameState;
 import io.github.yuyeol3.yachtbackend.game.MessageType;
 import io.github.yuyeol3.yachtbackend.game.dto.SocketResponse;
+import io.github.yuyeol3.yachtbackend.gameroom.dto.GameRoomEnterQuit;
+import io.github.yuyeol3.yachtbackend.gameroom.dto.ToggleResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -24,20 +27,30 @@ public class GameRoomWebSocketController {
     @MessageMapping("/rooms/{roomId}/enter")
     public void enterRoom(@DestinationVariable Long roomId, Principal principal) {
         Long userId = Long.parseLong(principal.getName());
-        GenericDataResponse<String> userNick = gameRoomService.addParticipant(roomId, userId);
+        GameRoomEnterQuit result = gameRoomService.addParticipant(roomId, userId);
 
         template.convertAndSend("/sub/rooms/" + roomId,
-                new SocketResponse<>(MessageType.ENTER, userNick.data())
+                new SocketResponse<>(MessageType.ENTER, result)
         );
     }
 
     @MessageMapping("/rooms/{roomId}/leave")
     public void leaveRoom(@DestinationVariable Long roomId, Principal principal) {
         Long userId = Long.parseLong(principal.getName());
-        GenericDataResponse<String> userNick = gameRoomService.removeParticipant(roomId, userId);
+        GameRoomEnterQuit result = gameRoomService.removeParticipant(roomId, userId);
 
         template.convertAndSend("/sub/rooms/" + roomId,
-            new SocketResponse<>(MessageType.QUIT, userNick.data())
+            new SocketResponse<>(MessageType.QUIT, result)
+        );
+    }
+
+    @MessageMapping("/rooms/{roomId}/start")
+    public void startGame(@DestinationVariable Long roomId, Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+        GameState state = gameRoomService.startGame(roomId, userId);
+
+        template.convertAndSend("/sub/rooms/" + roomId,
+                new SocketResponse<>(MessageType.START, state)
         );
     }
 
@@ -46,9 +59,9 @@ public class GameRoomWebSocketController {
         Long userId = Long.parseLong(principal.getName());
 
 
-        GenericDataResponse<Boolean> toggleResult = gameRoomService.toggleReady(roomId, userId);
+        ToggleResponse toggleResult = gameRoomService.toggleReady(roomId, userId);
         template.convertAndSend("/sub/rooms/" + roomId,
-            new SocketResponse<>(MessageType.TOGGLE_READY, toggleResult.data())
+            new SocketResponse<>(MessageType.TOGGLE_READY, toggleResult)
         );
     }
 

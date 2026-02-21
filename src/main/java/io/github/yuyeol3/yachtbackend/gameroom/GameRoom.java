@@ -34,9 +34,6 @@ public class GameRoom extends TimeEntity {
     @JoinColumn(name = "host_id")
     private User host;
 
-    @OneToMany(mappedBy = "gameRoom", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Participated> participants = new ArrayList<>();
-
     public GameRoom(User host, String roomName) {
         this.host = host;
         this.roomName = roomName;
@@ -52,7 +49,9 @@ public class GameRoom extends TimeEntity {
         this.status = GameStatus.WAITING;
     }
 
-
+    public void updateHost(User newHost) {
+        this.host = newHost;
+    }
 
 
 }
