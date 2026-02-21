@@ -47,7 +47,7 @@ public class GameRoomService {
     }
 
     public Slice<GameRoomResponse> getRooms(Pageable pageable) {
-        Slice<GameRoom> gameRoomSlice = gameRoomRepository.findGameRooms(pageable);
+        Slice<GameRoom> gameRoomSlice = gameRoomRepository.findAllBy(pageable);
         return gameRoomSlice.map((gr)-> GameRoomResponse.builder()
                     .id(gr.getId())
                     .roomName(gr.getRoomName())
@@ -63,8 +63,11 @@ public class GameRoomService {
                 .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));
 
         ParticipatedState host = participatedRepository.findByMemberId(gameRoom.getHost().getId())
-                .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));
-
+                .orElseGet(() -> new ParticipatedState(
+                        gameRoom.getHost().getId(),
+                        gameRoom.getHost().getNickname(),
+                        false
+                ));
         List<ParticipatedState> participants = participatedRepository.findMembersByRoomId(roomId);
 
         return GameRoomResponseDetail.builder()
@@ -150,7 +153,7 @@ public class GameRoomService {
         }
 
         participatedRepository.save(roomId, userId, user.getNickname());
-        ParticipatedState participant = participatedRepository.findByMemberIdAndRoomId(userId, roomId)
+        ParticipatedState participant = participatedRepository.findByMemberIdAndRoomId(roomId, userId)
                 .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));
 
         return GameRoomEnterQuit.builder()
@@ -170,7 +173,7 @@ public class GameRoomService {
         GameRoom gameRoom = gameRoomRepository.findById(roomId).orElseThrow(
                 ()->new BusinessException(ErrorCode.NOT_FOUND)
         );
-        ParticipatedState left = participatedRepository.findByMemberIdAndRoomId(userId, roomId)
+        ParticipatedState left = participatedRepository.findByMemberIdAndRoomId(roomId, userId)
                 .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));
         participatedRepository.leave(roomId, userId);
 

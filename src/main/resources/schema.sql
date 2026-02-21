@@ -1,9 +1,10 @@
 drop table if exists refresh_tokens cascade;
-drop table if exists users cascade;
 drop table if exists participated cascade;
 drop table if exists game_rooms cascade;
 drop table if exists played cascade;
 drop table if exists games cascade;
+drop table if exists users cascade;
+
 
 create table if not exists users(
     id BIGINT auto_increment primary key,
@@ -26,32 +27,30 @@ create table if not exists refresh_tokens(
 );
 
 create table if not exists games(
-    id BIGINT primary key,
+    id BIGINT auto_increment primary key,
     started_at TIMESTAMP not null,
     ended_at TIMESTAMP not null
 );
 
 create table if not exists played(
-    id BIGINT primary key,
-    game_id BIGINT references games(id) on delete cascade,
-    user_id BIGINT references users(id) on delete set null,
-    score INT,
-    game_result VARCHAR(255) not null
+    id BIGINT auto_increment primary key,
+    game_id BIGINT,
+    user_id BIGINT,
+    score INT not null,
+    game_rank INT not null,
+    game_result VARCHAR(255) not null,
+    foreign key (game_id) references games(id) on delete cascade,
+    foreign key (user_id) references users(id) on delete set null
 );
 
 create table if not exists game_rooms(
-    id BIGINT primary key,
+    id BIGINT auto_increment primary key,
     status varchar(255) not null,
+    room_name varchar(255) not null,
     version BIGINT default 0,
     created_at TIMESTAMP not null,
     updated_at TIMESTAMP not null,
-    host_id BIGINT references users(id) on delete cascade
+    host_id BIGINT,
+    FOREIGN KEY (id) references users(id) on delete cascade
 );
 
-create table if not exists participated(
-    id BIGINT primary key,
-    game_room_id BIGINT references game_rooms(id) on delete cascade ,
-    created_at TIMESTAMP not null,
-    updated_at TIMESTAMP not null,
-    user_id BIGINT references users(id) on delete cascade
-);

@@ -27,7 +27,7 @@ public class Played {
     @Column(name = "score",  nullable = false)
     private int score;
 
-    @Column(name = "rank", nullable = false)
+    @Column(name = "game_rank", nullable = false)
     private int rank;
 
     @Enumerated(EnumType.STRING)
