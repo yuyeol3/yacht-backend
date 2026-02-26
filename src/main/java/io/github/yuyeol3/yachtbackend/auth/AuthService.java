@@ -30,22 +30,26 @@ public class AuthService {
         String hashedPassword = user.getPassword();
         if (BCrypt.checkpw(loginRequest.password(), hashedPassword)) {
             String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getNickname());
-            byte[] rawRefreshToken = jwtUtil.generateRefreshToken();
-            byte[] hashedRefreshToken = jwtUtil.hashToken(rawRefreshToken);
-
-            RefreshToken refreshToken = RefreshToken.builder()
-                    .id(hashedRefreshToken)
-                    .validUntil(LocalDateTime.now().plusSeconds(jwtUtil.getRefreshExpiration()))
-                    .user(user)
-                    .build();
-            refreshTokenRepository.save(refreshToken);
-
-            return LoginResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(Base64.getEncoder().encodeToString(rawRefreshToken))
-                    .build();
+            return getLoginResponse(user, accessToken);
         }
         else throw new BusinessException(ErrorCode.INVALID_ID_OR_PWD);
+    }
+
+    private LoginResponse getLoginResponse(User user, String accessToken) {
+        byte[] rawRefreshToken = jwtUtil.generateRefreshToken();
+        byte[] hashedRefreshToken = jwtUtil.hashToken(rawRefreshToken);
+
+        RefreshToken refreshToken = RefreshToken.builder()
+                .id(hashedRefreshToken)
+                .validUntil(LocalDateTime.now().plusSeconds(jwtUtil.getRefreshExpiration()))
+                .user(user)
+                .build();
+        refreshTokenRepository.save(refreshToken);
+
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(Base64.getEncoder().encodeToString(rawRefreshToken))
+                .build();
     }
 
     @Transactional
@@ -80,19 +84,7 @@ public class AuthService {
             // Rotate refresh token: delete old, issue new
             refreshTokenRepository.delete(refreshToken);
 
-            byte[] newRawRefreshToken = jwtUtil.generateRefreshToken();
-            byte[] newHashedRefreshToken = jwtUtil.hashToken(newRawRefreshToken);
-            RefreshToken newRefreshToken = RefreshToken.builder()
-                    .id(newHashedRefreshToken)
-                    .validUntil(LocalDateTime.now().plusSeconds(jwtUtil.getRefreshExpiration()))
-                    .user(user)
-                    .build();
-            refreshTokenRepository.save(newRefreshToken);
-
-            return LoginResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(Base64.getEncoder().encodeToString(newRawRefreshToken))
-                    .build();
+            return getLoginResponse(user, accessToken);
         }
         catch (IllegalArgumentException e) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
