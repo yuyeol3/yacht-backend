@@ -51,6 +51,6 @@ create table if not exists game_rooms(
     created_at TIMESTAMP not null,
     updated_at TIMESTAMP not null,
     host_id BIGINT,
-    FOREIGN KEY (id) references users(id) on delete cascade
+    FOREIGN KEY (host_id) references users(id) on delete cascade
 );
 

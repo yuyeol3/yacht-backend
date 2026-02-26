@@ -27,7 +27,7 @@ public class ParticipatedRepository {
         }
 
         roomParticipants.computeIfAbsent(roomId, k -> new ConcurrentHashMap<>())
-                .put(userId, new ParticipatedState(userId, userNick, true));
+                .put(userId, new ParticipatedState(userId, userNick, false));
 
         userCurrentRoom.put(userId, roomId);
     }
