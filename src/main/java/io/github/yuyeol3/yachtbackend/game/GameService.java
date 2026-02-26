@@ -57,7 +57,9 @@ public class GameService {
 
         if (state.round() >= 13) {
             gameTimerService.cancelTimer(roomId);
-            gameResultService.saveGameResults(state);
+            state = state.toBuilder()
+                    .playedResults(gameResultService.saveGameResults(state))
+                    .build();
         }
         else if (action.type() == MessageType.SELECT_SCORE) {
             gameTimerService.startTurnTimer(

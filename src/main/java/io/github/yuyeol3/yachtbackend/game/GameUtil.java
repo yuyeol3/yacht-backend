@@ -13,6 +13,38 @@ public class GameUtil {
 
     private final int turnLimitMinutes = 3;
 
+    public static class UserScore {
+        Long userId;
+        int score;
+
+        public UserScore(Long userId, int score) {
+            this.userId = userId;
+            this.score = score;
+        }
+    }
+
+    // 내림차순 정렬된 userScores 리스트 받아 등수 배열을 반환하는 함수
+    public int[] calcRanks(UserScore[] userScores, int totalUser) {
+        int[] ranks =  new int[totalUser];
+        for (int i = 0; i < totalUser; i++) {
+            if (i == 0) ranks[i] = 1;
+            else
+                ranks[i] = ranks[i - 1] + (userScores[i].score == userScores[i - 1].score ? 0 : 1);
+        }
+        return ranks;
+    }
+
+    public boolean calcIsDraw(int[] ranks, int totalUser, int leftUser) {
+        boolean isDraw = true;
+
+        for (int i = 0; i < totalUser; i++) {
+            isDraw = isDraw && (ranks[i] == 1); // 모든 사람이 1등이면 모두 무승부
+        }
+        // 방에 사람이 혼자 남아있으면 무승부 아님
+        isDraw = isDraw && !(leftUser == 1);
+        return isDraw;
+    }
+
     public String getFirstEmptyCategory(UserScoreBoard board) {
         if (board.ones() == null) return "ONES";
         if (board.twos() == null) return "TWOS";

@@ -19,12 +19,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<GenericDataResponse<String>> login(@RequestBody @Valid LoginRequest loginRequest){
         LoginResponse res = authService.login(loginRequest);
-        ResponseCookie cookie = ResponseCookie
-                .from("refresh_token", res.refreshToken())
-                .httpOnly(true)
-                .secure(false)
-                .sameSite("Strict")
-                .path("/auth")
+        ResponseCookie cookie = getRefreshTokenCookie(res.refreshToken())
                 .maxAge(jwtUtil.getRefreshExpiration())
                 .build();
 
@@ -38,9 +33,8 @@ public class AuthController {
         authService.logout(refreshToken);
 
         // 클라이언트 쿠키 삭제용
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
+        ResponseCookie cookie = getRefreshTokenCookie("")
                 .maxAge(0)
-                .path("/auth")
                 .build();
 
         return ResponseEntity.noContent()
@@ -51,18 +45,21 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<GenericDataResponse<String>> refresh(@CookieValue("refresh_token") String refreshToken) {
         LoginResponse res = authService.refresh(refreshToken);
-        ResponseCookie cookie = ResponseCookie
-                .from("refresh_token", res.refreshToken())
-                .httpOnly(true)
-                .secure(false)
-                .sameSite("Strict")
-                .path("/auth")
+        ResponseCookie cookie = getRefreshTokenCookie(res.refreshToken())
                 .maxAge(jwtUtil.getRefreshExpiration())
                 .build();
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new GenericDataResponse<>(res.accessToken()));
+    }
+
+    private ResponseCookie.ResponseCookieBuilder getRefreshTokenCookie(String token) {
+        return ResponseCookie.from("refresh_token", token)
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Strict")
+                .path("/");
     }
 
 }

@@ -1,5 +1,6 @@
 package io.github.yuyeol3.yachtbackend.game;
 
+import io.github.yuyeol3.yachtbackend.game.dto.PlayedResponse;
 import io.github.yuyeol3.yachtbackend.game.dto.UserScoreBoard;
 import lombok.Builder;
 
@@ -19,7 +20,8 @@ public record GameState(
         List<Long> turnList,
         List<Integer> dice,
         List<Boolean> kept,
-        Map<Long, UserScoreBoard> scores
+        Map<Long, UserScoreBoard> scores,
+        List<PlayedResponse> playedResults
 ) {
 
 }
