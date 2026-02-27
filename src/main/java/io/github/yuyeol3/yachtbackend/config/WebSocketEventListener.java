@@ -1,5 +1,6 @@
 package io.github.yuyeol3.yachtbackend.config;
 
+import io.github.yuyeol3.yachtbackend.error.BusinessException;
 import io.github.yuyeol3.yachtbackend.game.MessageType;
 import io.github.yuyeol3.yachtbackend.game.dto.SocketResponse;
 import io.github.yuyeol3.yachtbackend.gameroom.GameRoomService;
@@ -39,6 +40,9 @@ public class WebSocketEventListener {
                     template.convertAndSend("/sub/rooms/" + roomId,
                             new SocketResponse<>(MessageType.QUIT, result)
                     );
+                }
+                catch (BusinessException be) {
+                    log.warn("웹소켓 강제퇴장 처리 중 비즈니스 오류 발생", be);
                 }
                 catch (Exception e) {
                     log.error("웹소켓 강제퇴장 처리 중 에러 발생", e);
