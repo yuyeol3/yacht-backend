@@ -31,6 +31,7 @@ public enum ErrorCode {
     NOT_ROLLED(HttpStatus.BAD_REQUEST, "G004", "아직 주사위를 굴리지 않았습니다."),
     ALREADY_PLAYING(HttpStatus.BAD_REQUEST, "G005", "이미 게임이 진행 중입니다."),
     NOT_READY(HttpStatus.BAD_REQUEST, "G006", "준비하지 않은 참가자가 있습니다."),
+    GAME_ROOM_IS_FULL(HttpStatus.BAD_REQUEST, "G007", "게임 방이 가득 찼습니다."),
     ;
 
 

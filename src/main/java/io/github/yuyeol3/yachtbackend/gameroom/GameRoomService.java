@@ -152,6 +152,11 @@ public class GameRoomService {
             throw new BusinessException(ErrorCode.ALREADY_PLAYING);
         }
 
+        if (participatedRepository.findMembersByRoomId(roomId).size()
+                >= gameUtil.getUserLimitPerRoom()) {
+            throw new BusinessException(ErrorCode.GAME_ROOM_IS_FULL);
+        }
+
         participatedRepository.save(roomId, userId, user.getNickname());
         ParticipatedState participant = participatedRepository.findByMemberIdAndRoomId(roomId, userId)
                 .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));

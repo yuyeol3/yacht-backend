@@ -25,11 +25,11 @@ public class JwtUtil {
     public JwtUtil(
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration}") Long expiration,
-            @Value("${jwt.refresh_expiration}") Long refresh_expiration
+            @Value("${jwt.refresh_expiration}") Long refreshExpiration
     ) {
         this.SECRET = secret;
         this.EXPIRATION = expiration * 1000;
-        this.REFRESH_EXPIRATION = refresh_expiration ;
+        this.REFRESH_EXPIRATION = refreshExpiration ;
         this.secureRandom = new SecureRandom();
     }
 

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class GameUtilTest {
 
-    private final GameUtil gameUtil = new GameUtil();
+    private final GameUtil gameUtil = new GameUtil(3, 4);
 
     @Test
     void calcRanks_assigns_same_rank_for_tied_scores() {

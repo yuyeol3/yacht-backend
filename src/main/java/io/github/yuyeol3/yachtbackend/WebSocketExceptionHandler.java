@@ -22,15 +22,15 @@ public class WebSocketExceptionHandler {
     public SocketResponse<ErrorResponse> handleBusinessException(BusinessException e, Principal principal) {
         ErrorCode code = e.getErrorCode();
         log.warn("[웹소켓 예외] 유저: {}, 에러: {}", principal.getName(), e.getErrorCode().getMessage());
-        e.printStackTrace();
+//        e.printStackTrace();
         return new SocketResponse<>(MessageType.ERROR, new ErrorResponse(code.getCode(), code.getMessage()));
     }
 
     @MessageExceptionHandler(Exception.class)
     @SendToUser("/queue/errors")
     public SocketResponse<ErrorResponse> handleException(Exception e, Principal principal) {
-        log.error("[웹소켓 치명적 에러] 유저: {}", principal.getName(), e);
-        e.printStackTrace();
+        log.error("[치명적 에러] 유저: {}", principal.getName(), e);
+//        e.printStackTrace();
         ErrorCode code = ErrorCode.INTERNAL_SERVER_ERROR;
         return new SocketResponse<>(MessageType.ERROR, new ErrorResponse(code.getCode(), code.getMessage()));
     }

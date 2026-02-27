@@ -2,6 +2,7 @@ package io.github.yuyeol3.yachtbackend.game;
 
 import io.github.yuyeol3.yachtbackend.game.dto.UserScoreBoard;
 import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,7 +12,16 @@ import java.util.List;
 @Getter
 public class GameUtil {
 
-    private final int turnLimitMinutes = 3;
+    private final int turnLimitMinutes;
+    private final int userLimitPerRoom;
+
+    public GameUtil(
+            @Value("${game.rule.turn_limit_minutes}") int turnLimitMinutes,
+            @Value("${game.rule.user_limit_per_room}") int userLimitPerRoom
+    ) {
+        this.turnLimitMinutes = turnLimitMinutes;
+        this.userLimitPerRoom = userLimitPerRoom;
+    }
 
     public static class UserScore {
         Long userId;
