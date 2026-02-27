@@ -8,4 +8,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BusinessException extends RuntimeException {
     private final ErrorCode errorCode;
+
+    @Override
+    public String getMessage() {
+        return errorCode.getMessage();
+    }
 }

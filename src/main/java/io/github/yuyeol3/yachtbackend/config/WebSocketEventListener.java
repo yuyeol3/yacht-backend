@@ -36,12 +36,12 @@ public class WebSocketEventListener {
                 try {
                     GameRoomEnterQuit result = gameRoomService.removeParticipant(roomId, userId);
 
-                    template.convertAndSend("/sub/rooms" + roomId,
+                    template.convertAndSend("/sub/rooms/" + roomId,
                             new SocketResponse<>(MessageType.QUIT, result)
                     );
                 }
                 catch (Exception e) {
-                    log.error(e.getMessage());
+                    log.error("웹소켓 강제퇴장 처리 중 에러 발생", e);
                 }
             }
         }
