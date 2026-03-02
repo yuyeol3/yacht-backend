@@ -81,6 +81,17 @@ public class ParticipatedRepository {
         }).isReady();
     }
 
+    public void resetReadyAll(Long roomId) {
+        Map<Long, ParticipatedState> participants = roomParticipants.get(roomId);
+        if (participants == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND);
+        }
+
+        participants.replaceAll((userId, oldState)->
+                oldState.toBuilder().isReady(false).build()
+        );
+    }
+
 
     // 불변 리스트 반환
     public List<ParticipatedState> findMembersByRoomId(Long roomId) {

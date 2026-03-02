@@ -5,6 +5,8 @@ import io.github.yuyeol3.yachtbackend.error.ErrorCode;
 import io.github.yuyeol3.yachtbackend.game.dto.GameAction;
 import io.github.yuyeol3.yachtbackend.game.dto.SocketResponse;
 import io.github.yuyeol3.yachtbackend.game.dto.UserScoreBoard;
+import io.github.yuyeol3.yachtbackend.gameroom.GameRoomRepository;
+import io.github.yuyeol3.yachtbackend.gameroom.GameRoomService;
 import io.github.yuyeol3.yachtbackend.gameroom.ParticipatedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -57,6 +59,7 @@ public class GameService {
 
         if (state.round() >= 13) {
             gameTimerService.cancelTimer(roomId);
+            participatedRepository.resetReadyAll(roomId);
             state = state.toBuilder()
                     .playedResults(gameResultService.saveGameResults(state))
                     .build();
