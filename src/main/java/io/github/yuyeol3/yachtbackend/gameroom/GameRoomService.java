@@ -184,18 +184,24 @@ public class GameRoomService {
 
         // 나가는 사람이 방장이면 아무에게나 위임
         ParticipatedState host = null;
-        if (gameRoom.getHost().getId().equals(userId)) {
-            List<ParticipatedState> leftParticipants = participatedRepository.findMembersByRoomId(roomId);
-            if (leftParticipants.isEmpty()) {
-                gameRoomRepository.deleteById(roomId);
+        List<ParticipatedState> leftParticipants = participatedRepository.findMembersByRoomId(roomId);
+
+        if (leftParticipants.isEmpty()) {
+            if (gameRoom.getStatus().equals(GameStatus.PLAYING)) {
+                gameService.abortGame(roomId);
             }
-            else {
+            gameRoomRepository.deleteById(roomId);
+        }
+        else {
+            if (gameRoom.getHost().getId().equals(userId)) {
+
                 User newHost = userRepository.findById(leftParticipants.getFirst().userId())
                         .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));
                 host = participatedRepository.findByMemberIdAndRoomId(roomId, newHost.getId())
-                                .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));
+                        .orElseThrow(()->new BusinessException(ErrorCode.NOT_FOUND));
 
                 gameRoom.updateHost(newHost);
+
             }
         }
 

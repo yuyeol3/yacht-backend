@@ -31,6 +31,8 @@ public class GameStateRepository {
         });
     }
 
-
+    public void remove(Long roomId) {
+        store.remove(roomId);
+    }
 
 }
