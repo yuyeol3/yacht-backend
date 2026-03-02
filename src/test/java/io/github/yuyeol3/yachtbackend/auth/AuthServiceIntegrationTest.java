@@ -1,6 +1,5 @@
 package io.github.yuyeol3.yachtbackend.auth;
 
-import io.github.yuyeol3.yachtbackend.JwtUtil;
 import io.github.yuyeol3.yachtbackend.user.UserCreateRequest;
 import io.github.yuyeol3.yachtbackend.user.UserService;
 import org.junit.jupiter.api.Test;

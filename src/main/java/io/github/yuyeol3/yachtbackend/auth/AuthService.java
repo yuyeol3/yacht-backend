@@ -1,6 +1,5 @@
 package io.github.yuyeol3.yachtbackend.auth;
 
-import io.github.yuyeol3.yachtbackend.JwtUtil;
 import io.github.yuyeol3.yachtbackend.error.BusinessException;
 import io.github.yuyeol3.yachtbackend.error.ErrorCode;
 import io.github.yuyeol3.yachtbackend.user.User;

@@ -1,8 +1,8 @@
 package io.github.yuyeol3.yachtbackend.config;
 
 
-import io.github.yuyeol3.yachtbackend.JwtAuthFilter;
-import io.github.yuyeol3.yachtbackend.JwtUtil;
+import io.github.yuyeol3.yachtbackend.auth.JwtAuthFilter;
+import io.github.yuyeol3.yachtbackend.auth.JwtUtil;
 import io.github.yuyeol3.yachtbackend.user.MyUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,11 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity

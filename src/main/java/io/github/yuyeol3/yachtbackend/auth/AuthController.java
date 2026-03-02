@@ -1,7 +1,6 @@
 package io.github.yuyeol3.yachtbackend.auth;
 
 import io.github.yuyeol3.yachtbackend.GenericDataResponse;
-import io.github.yuyeol3.yachtbackend.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
